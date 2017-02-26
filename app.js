@@ -11,7 +11,7 @@ function Product(name, path) {
   productArr.push(this)
 }
 
-// Producing each new product
+// Producing path to new product
 for (var i = 0; i < productNames.length; i++) {
   new Product(productNames[i], 'img/' + productNames[i] + '.jpg');
 }
@@ -59,3 +59,10 @@ productArr[pictureIndex];
 }
 
 showPictures();
+
+// Click event handler
+function handleClickEvent(event) {
+  target.addEventListener(handleClickEvent)
+
+
+}
