@@ -1,0 +1,14 @@
+* {
+margin-left: 20px;
+margin-right: 20px;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+}
