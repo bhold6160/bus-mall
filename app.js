@@ -25,12 +25,6 @@ function Product(name, path) {
   console.log(productArr);
 })();
 
-// Random number generator
-// function randomPic() {
-//   console.log(randomPic);
-//   return Math.floor(Math.random() * productNames.length);
-// }
-
 var tracker = {
   img1: document.getElementById('img1'),
   img2: document.getElementById('img2'),
@@ -38,7 +32,7 @@ var tracker = {
   showResultsEl: document.getElementById('showResults'),
   resultsEl: document.getElementById('results'),
   imageContainerEl: document.getElementById('imageContainer'),
-  resetResults: document.getElementById('reset'),
+  reset: document.getElementById('reset'),
   imgObj1: null,
   imgObj2: null,
   imgObj3: null,
@@ -106,7 +100,8 @@ var tracker = {
   },
 
   resetResults: function () {
-    this.resetResults.addEventListener('click', function (e) {
+    this.reset.addEventListener('click', function (e) {
+      tracker.reload(reset);
     });
   },
 };

@@ -8,7 +8,12 @@ margin-right: 20px;
   justify-content: flex-end;
 }
 
-.results {
+.images {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#results {
+  display: flex;
+  justify-content: flex-start;
 }
