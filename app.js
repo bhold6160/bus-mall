@@ -38,6 +38,7 @@ var tracker = {
   showResultsEl: document.getElementById('showResults'),
   resultsEl: document.getElementById('results'),
   imageContainerEl: document.getElementById('imageContainer'),
+  resetResults: document.getElementById('reset'),
   imgObj1: null,
   imgObj2: null,
   imgObj3: null,
@@ -102,6 +103,11 @@ var tracker = {
     }
 
     this.resultsEl.appendChild(ulResults);
+  },
+
+  resetResults: function () {
+    this.resetResults.addEventListener('click', function (e) {
+    });
   },
 };
 
