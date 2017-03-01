@@ -1,5 +1,10 @@
+// 1. Generate three random, non-dupe images (part of the controller)
+// 2. Object constructor for Products:
+// a. Include name, path, votes
+// 3. A tracker object that will controll functionality of app
+// 4. Event listener(s) for image clicks
 
-var productNames = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','tauntaun','unicorn','water-can','wine-glass'];
+var productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'tauntaun', 'unicorn', 'water-can', 'wine-glass'];
 
 var productArr = [];
 
@@ -8,61 +13,97 @@ function Product(name, path) {
   this.name = name;
   this.votes = 0;
   this.path = path;
-  productArr.push(this)
+  productArr.push(this);
 }
 
-// Producing path to new product
-for (var i = 0; i < productNames.length; i++) {
-  new Product(productNames[i], 'img/' + productNames[i] + '.jpg');
-}
-console.log(productArr);
+// a simple IIFE to build all the product images // Producing path to new product
+(function () {
+  for (var i = 0; i < productNames.length; i++) {
+    new Product(productNames[i], 'img/' + productNames[i] + '.jpg');
+  }
+
+  console.log(productArr);
+})();
 
 // Random number generator
-function randomPic() {
-  console.log(randomPic)
-  return Math.floor(Math.random() * productNames.length);
-}
+// function randomPic() {
+//   console.log(randomPic);
+//   return Math.floor(Math.random() * productNames.length);
+// }
 
-// Attaching pictures to the DOM
-function showPictures() {
-  console.log(showPictures);
-  var img1 = document.getElementById('img1');
-  var img2 = document.getElementById('img2');
-  var img3 = document.getElementById('img3');
+var tracker = {
+  img1: document.getElementById('img1'),
+  img2: document.getElementById('img2'),
+  img3: document.getElementById('img3'),
+  showResultsEl: document.getElementById('showResults'),
+  resultsEl: document.getElementById('results'),
+  imageContainerEl: document.getElementById('imageContainer'),
+  imgObj1: null,
+  imgObj2: null,
+  imgObj3: null,
+  clicks: 1,
 
-  img1.textContent = '';
-  img2.textContent = '';
-  img3.textContent = '';
+  randomPic: function () {
+    // console.log(randomPic);
+    return Math.floor(Math.random() * productNames.length);
+  },
 
-var pictureIndex = randomPic();
-img1.src = productArr[pictureIndex].path;
-img1.id = productArr[pictureIndex].name;
-productArr[pictureIndex];
+  showPictures: function () {
+    this.imgObj1 = productArr[this.randomPic()];
+    this.imgObj2 = productArr[this.randomPic()];
+    this.imgObj3 = productArr[this.randomPic()];
 
-var pictureIndex2 = randomPic();
-while (pictureIndex2 === pictureIndex) {
-  pictureIndex2 = randomPic();
-}
+    if (this.imgObj1 === this.imgObj2 || this.imgObj1 === this.imgObj3 || this.imgObj2 === this.imgObj3) {
+      this.showPictures();
+    }
 
-img2.src = productArr[pictureIndex2].path;
-img2.id = productArr[pictureIndex2].name;
-productArr[pictureIndex2];
+    this.img1.src = this.imgObj1.path;
+    this.img1.id = this.imgObj1.name;
+    this.img2.src = this.imgObj2.path;
+    this.img2.id = this.imgObj2.name;
+    this.img3.src = this.imgObj3.path;
+    this.img3.id = this.imgObj3.name;
+  },
 
-var pictureIndex3 = randomPic();
-while (pictureIndex3 === pictureIndex2 || pictureIndex3 === pictureIndex) {
-  pictureIndex3 = randomPic();
-}
-img3.src = productArr[pictureIndex3].path;
-img3.id = productArr[pictureIndex3].name;
-productArr[pictureIndex];
+  limitClicks: function () {
+    if (this.clicks > 14) {
+      this.imageContainerEl.removeEventListener('click', this.clickHandler);
+      this.showResultsEl.addEventListener('click', function (e) {
+        e.preventDefault();
+        tracker.showResults();
+      });
+    }
+  },
 
-}
+  clickHandler: function (e) {
+    tracker.limitClicks();
+    if (e.target.id === tracker.imgObj1.name || e.target.id === tracker.imgObj2.name || e.target.id === tracker.imgObj3.name) {
+      tracker.clicks++;
+      tracker.showPictures();
+      tracker.tallyVotes(e.target.id);
+    }
+  },
 
-showPictures();
+  tallyVotes: function (tallyId) {
+    for (var i in productArr) {
+      if (tallyId === productArr[i].name) {
+        productArr[i].votes += 1;
+        break;
+      }
+    }
+  },
 
-// Click event handler
-function handleClickEvent(event) {
-  target.addEventListener(handleClickEvent)
+  showResults: function () {
+    var ulResults = document.createElement('ul');
+    for (var i in productArr) {
+      var listResults = document.createElement('li');
+      listResults.textContent = productArr[i].name + ': ' + productArr[i].votes;
+      ulResults.appendChild(listResults);
+    }
 
+    this.resultsEl.appendChild(ulResults);
+  },
+};
 
-}
+tracker.imageContainerEl.addEventListener('click', tracker.clickHandler);
+tracker.showPictures();
