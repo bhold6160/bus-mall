@@ -8,23 +8,53 @@ var productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegu
 
 var productArr = [];
 
+// Creating chart
+var ctx = document.getElementById('myChart').getContext('2d');
+var chartData = {
+  type: 'bar',
+  data: {
+    labels: productNames,
+    datasets: [{
+      label: '# of Votes',
+      data: [],
+      backgroundColor: [],
+      borderColor: 'purple',
+      borderWidth: 1,
+    }]
+  },
+  options: {
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: true
+        },
+      }]
+    },
+  },
+};
+
+
 // Constructor function
-function Product(name, path) {
+function Product(name, path, color) {
   this.name = name;
   this.votes = 0;
   this.path = path;
+  this.colors = color;
   productArr.push(this);
+  chartData.data.datasets[0].data.push(this.votes);
+  chartData.data.datasets[0].backgroundColor.push(this.colors);
 }
 
 // a simple IIFE to build all the product images // Producing path to new product
 (function () {
-  for (var i = 0; i < productNames.length; i++) {
+  for (var i in productNames) {
     new Product(productNames[i], 'img/' + productNames[i] + '.jpg');
   }
 
   console.log(productArr);
 })();
 
+// Tracker data
 var tracker = {
   img1: document.getElementById('img1'),
   img2: document.getElementById('img2'),
@@ -32,10 +62,9 @@ var tracker = {
   showResultsEl: document.getElementById('showResults'),
   resultsEl: document.getElementById('results'),
   imageContainerEl: document.getElementById('imageContainer'),
-  reset: document.getElementById('reset'),
-  imgObj1: null,
-  imgObj2: null,
-  imgObj3: null,
+  imgObj1: this.imgObj1,
+  imgObj2: this.imgObj2,
+  imgObj3: this.imgObj3,
   clicks: 1,
 
   randomPic: function () {
@@ -43,6 +72,7 @@ var tracker = {
     return Math.floor(Math.random() * productNames.length);
   },
 
+  // Creating three random images
   showPictures: function () {
     this.imgObj1 = productArr[this.randomPic()];
     this.imgObj2 = productArr[this.randomPic()];
@@ -60,6 +90,7 @@ var tracker = {
     this.img3.id = this.imgObj3.name;
   },
 
+  // Limiting number of clicks to 15 and then stopping images from changing when limit is reached
   limitClicks: function () {
     if (this.clicks > 14) {
       this.imageContainerEl.removeEventListener('click', this.clickHandler);
@@ -70,6 +101,7 @@ var tracker = {
     }
   },
 
+  //Tracking which image is clicked and then refreshing all three images after each click
   clickHandler: function (e) {
     tracker.limitClicks();
     if (e.target.id === tracker.imgObj1.name || e.target.id === tracker.imgObj2.name || e.target.id === tracker.imgObj3.name) {
@@ -79,15 +111,19 @@ var tracker = {
     }
   },
 
+  // Tallying which images are being clicked and dynamically populating chart
   tallyVotes: function (tallyId) {
     for (var i in productArr) {
       if (tallyId === productArr[i].name) {
         productArr[i].votes += 1;
+        myChart.data.datasets[0].data[i]++;
+        myChart.update();
         break;
       }
     }
   },
 
+  // Creating results list and appending to the DOM
   showResults: function () {
     var ulResults = document.createElement('ul');
     for (var i in productArr) {
@@ -98,13 +134,8 @@ var tracker = {
 
     this.resultsEl.appendChild(ulResults);
   },
-
-  resetResults: function () {
-    this.reset.addEventListener('click', function (e) {
-      tracker.reload(reset);
-    });
-  },
 };
 
+var myChart = new Chart(ctx, chartData);
 tracker.imageContainerEl.addEventListener('click', tracker.clickHandler);
 tracker.showPictures();
