@@ -26,7 +26,7 @@ var chartData = {
     scales: {
       yAxes: [{
         ticks: {
-          beginAtZero: true
+          beginAtZero: true;
         },
       }]
     },
@@ -49,6 +49,12 @@ function Product(name, path, color) {
 (function () {
   for (var i in productNames) {
     new Product(productNames[i], 'img/' + productNames[i] + '.jpg');
+  }
+
+  var stringifiedAllProducts = localStorage.getItem('stringfiedAllProducts');
+  var parsedAllProducts = JSON.parse(stringifiedAllProducts);
+  for (var i in parsedAllProducts) {
+    productArr[i].votes = parsedAllProducts[i].votes;
   }
 
   console.log(productArr);
@@ -109,6 +115,8 @@ var tracker = {
       tracker.showPictures();
       tracker.tallyVotes(e.target.id);
     }
+
+    localStorage.setItem('stringfiedAllProducts', JSON.stringify(productArr));
   },
 
   // Tallying which images are being clicked and dynamically populating chart
@@ -139,3 +147,4 @@ var tracker = {
 var myChart = new Chart(ctx, chartData);
 tracker.imageContainerEl.addEventListener('click', tracker.clickHandler);
 tracker.showPictures();
+localStorage.getItem('stringfiedAllProducts');
