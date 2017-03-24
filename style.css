@@ -43,11 +43,15 @@ h1 {
 }
 
 .chart {
-  width: 50%;
+  display: flex;
+  justify-content: flex-end;
+  width: 40%;
   height: 20%;
 }
 
 #showResults {
+  display: flex;
+  justify-content: flex-start;
   padding-left: 10em;
   padding-right: 10em;
 }
