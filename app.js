@@ -1,48 +1,13 @@
-// 1. Generate three random, non-dupe images (part of the controller)
-// 2. Object constructor for Products:
-// a. Include name, path, votes
-// 3. A tracker object that will controll functionality of app
-// 4. Event listener(s) for image clicks
-
 var productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'tauntaun', 'unicorn', 'water-can', 'wine-glass'];
 
 var productArr = [];
-
-// Creating chart
-var ctx = document.getElementById('myChart').getContext('2d');
-var chartData = {
-  type: 'bar',
-  data: {
-    labels: productNames,
-    datasets: [{
-      label: '# of Votes',
-      data: [],
-      backgroundColor: [],
-      borderColor: 'purple',
-      borderWidth: 1,
-    }]
-  },
-  options: {
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: true,
-        },
-      }]
-    },
-  },
-};
-
 
 // Constructor function
 function Product(name, path, color) {
   this.name = name;
   this.votes = 0;
   this.path = path;
-  this.colors = color;
   productArr.push(this);
-  chartData.data.datasets[0].data.push(this.votes);
-  chartData.data.datasets[0].backgroundColor.push(this.colors);
 }
 
 // a simple IIFE to build all the product images // Producing path to new product
@@ -60,7 +25,7 @@ function Product(name, path, color) {
   console.log(productArr);
 })();
 
-// Tracker data
+// object literal tracker data
 var tracker = {
   img1: document.getElementById('img1'),
   img2: document.getElementById('img2'),
@@ -68,13 +33,16 @@ var tracker = {
   showResultsEl: document.getElementById('showResults'),
   resultsEl: document.getElementById('results'),
   imageContainerEl: document.getElementById('imageContainer'),
+  chartResults: document.getElementById('showChart'),
+
   imgObj1: this.imgObj1,
   imgObj2: this.imgObj2,
   imgObj3: this.imgObj3,
   clicks: 1,
+  chartData: null,
+  counter: [],
 
   randomPic: function () {
-    // console.log(randomPic);
     return Math.floor(Math.random() * productNames.length);
   },
 
@@ -96,27 +64,27 @@ var tracker = {
     this.img3.id = this.imgObj3.name;
   },
 
-  // Limiting number of clicks to 15 and then stopping images from changing when limit is reached
+  // Limiting tp 15 click and displaying results when reached
   limitClicks: function () {
     if (this.clicks > 14) {
       this.imageContainerEl.removeEventListener('click', this.clickHandler);
-      this.showResultsEl.addEventListener('click', function (e) {
-        e.preventDefault();
-        tracker.showResults();
-      });
+      tracker.tallyVotes();
+      tracker.showResults();
+      return;
     }
   },
 
-  //Tracking which image is clicked and then refreshing all three images after each click
+  // Tracking clicked images and showing new set
   clickHandler: function (e) {
-    tracker.limitClicks();
     if (e.target.id === tracker.imgObj1.name || e.target.id === tracker.imgObj2.name || e.target.id === tracker.imgObj3.name) {
       tracker.clicks++;
       tracker.showPictures();
       tracker.tallyVotes(e.target.id);
+      tracker.countVotes();
     }
 
     localStorage.setItem('stringfiedAllProducts', JSON.stringify(productArr));
+    tracker.limitClicks();
   },
 
   // Tallying which images are being clicked and dynamically populating chart
@@ -124,9 +92,7 @@ var tracker = {
     for (var i in productArr) {
       if (tallyId === productArr[i].name) {
         productArr[i].votes += 1;
-        myChart.data.datasets[0].data[i]++;
-        myChart.update();
-        break;
+        tracker.counter.push(productArr[i].votes);
       }
     }
   },
@@ -142,9 +108,50 @@ var tracker = {
 
     this.resultsEl.appendChild(ulResults);
   },
+
+  //counts time pics are selected
+  countVotes: function() {
+    if (event.target.id === tracker.img1.name) {
+      tracker.img1.votes++;
+    }
+    if (event.target.id === tracker.img2.name) {
+      tracker.img2.votes++;
+    }
+    if (event.target.id === tracker.img3.name) {
+      tracker.img3.votes++;
+    }
+    tracker.showPictures();
+  }
 };
 
-var myChart = new Chart(ctx, chartData);
+//Event listeners
 tracker.imageContainerEl.addEventListener('click', tracker.clickHandler);
+
+tracker.chartResults.addEventListener('click', getChart);
+
 tracker.showPictures();
 localStorage.getItem('stringfiedAllProducts');
+
+// Creating chart
+function getChart() {
+createChart();
+};
+
+  var data = {
+    labels: productNames,
+    datasets: [{
+      label: '# of Votes',
+      data: tracker.counter,
+      backgroundColor: [],
+      borderColor: 'purple',
+      borderWidth: 1,
+    }]
+  };
+
+function createChart() {
+  var ctx = document.getElementById('myChart').getContext('2d');
+myChart = new Chart(ctx, {
+  type: 'bar',
+  data: data,
+})
+};
